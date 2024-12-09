@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wichteln ohne Passwort</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; }
+    #output, #assignOutput { margin-top: 20px; }
+    #assignForm, #output, #assignOutput { display: none; }
+  </style>
+</head>
+<body>
+  <h1>Wichteln ohne Passwort</h1>
+
+  <div id="loginForm">
+    <label for="name">Deinen Namen eingeben:</label>
+    <input type="text" id="name" required>
+    <button onclick="login()">Anmelden</button>
+  </div>
+
+  <div id="assignForm">
+    <button onclick="zeigeWichtelpartner()">Wichtelpartner anzeigen</button>
+  </div>
+
+  <div id="output"></div>
+  <div id="assignOutput"></div>
+
+  <script>
+    const gruppe1 = ["Silvio", "Remo", "Martin", "Karin", "Nina"];
+    const gruppe2 = ["Sandro", "Claudia", "Christian", "Nicole", "Sina", "Pascal"];
+    let wichtelZuordnungen = {};
+
+    function seedRandom(seed) {
+      let x = Math.sin(seed) * 10000;
+      return x - Math.floor(x);
+    }
+
+    function login() {
+      const name = document.getElementById("name").value;
+
+      if (name && (gruppe1.includes(name) || gruppe2.includes(name))) {
+        document.getElementById("loginForm").style.display = "none";
+        document.getElementById("assignForm").style.display = "block";
+        
+        if (Object.keys(wichtelZuordnungen).length === 0) {
+          generiereWichtelzuweisungen();
+        }
+      } else {
+        alert("Dein Name muss in einer der Wichtelgruppen sein.");
+      }
+    }
+
+    function generiereWichtelzuweisungen() {
+      let gruppe2Copy = [...gruppe2];
+      
+      // Zuweisungen von Gruppe 1 an Gruppe 2
+      gruppe1.forEach((person, index) => {
+        const seed = person.length + index;
+        const randomIndex = Math.floor(seedRandom(seed) * gruppe2Copy.length);
+        const wichtelPartner = gruppe2Copy.splice(randomIndex, 1)[0];
+        wichtelZuordnungen[person] = wichtelPartner;
+      });
+      
+      // Übrige Person aus Gruppe 2 wichtelt innerhalb von Gruppe 2
+      const interneWichtelPerson = gruppe2Copy[0];
+      let restGruppe2 = gruppe2.filter(person => person !== interneWichtelPerson);
+      const seed = interneWichtelPerson.length;
+      const randomIndex = Math.floor(seedRandom(seed) * restGruppe2.length);
+      const internePartner = restGruppe2[randomIndex];
+      wichtelZuordnungen[interneWichtelPerson] = internePartner;
+    }
+
+    function zeigeWichtelpartner() {
+      const name = document.getElementById("name").value;
+      if (wichtelZuordnungen[name]) {
+        document.getElementById("assignOutput").style.display = "block";
+        document.getElementById("assignOutput").innerHTML = `<p>Du wichtelst: ${wichtelZuordnungen[name]}</p>`;
+      } else {
+        alert("Keine Zuweisung für diesen Namen gefunden. Bitte überprüfe die Eingabe oder melde dich neu an.");
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,21 +1,37 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wichteln ohne Passwort</title>
+  <title>Wichteln</title>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; }
-    #output, #assignOutput { margin-top: 20px; }
-    #assignForm, #output, #assignOutput { display: none; }
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+
+    #output,
+    #assignOutput {
+      margin-top: 20px;
+    }
+
+    #assignForm,
+    #output,
+    #assignOutput {
+      display: none;
+    }
   </style>
 </head>
+
 <body>
-  <h1>Wichteln ohne Passwort</h1>
+  <h1>Wichteln mit Passwort</h1>
 
   <div id="loginForm">
     <label for="name">Deinen Namen eingeben:</label>
     <input type="text" id="name" required>
+    <label for="password">Passwort eingeben:</label>
+    <input type="password" id="password" required>
     <button onclick="login()">Anmelden</button>
   </div>
 
@@ -29,6 +45,19 @@
   <script>
     const gruppe1 = ["Silvio", "Remo", "Martin", "Karin", "Nina"];
     const gruppe2 = ["Sandro", "Claudia", "Christian", "Nicole", "Sina", "Pascal"];
+    const passwoerter = {
+      "Silvio": "passwort1",
+      "Remo": "Penis1",
+      "Martin": "Daumenrauf",
+      "Karin": "HelloWorld",
+      "Nina": "Loveyou",
+      "Sandro": "Schwanz",
+      "Claudia": "Claudia",
+      "Christian": "Agrola",
+      "Nicole": "TestPasswort",
+      "Sina": "Sandro",
+      "Pascal": "JackDaniels"
+    };
     let wichtelZuordnungen = {};
 
     function seedRandom(seed) {
@@ -38,22 +67,23 @@
 
     function login() {
       const name = document.getElementById("name").value;
+      const password = document.getElementById("password").value;
 
-      if (name && (gruppe1.includes(name) || gruppe2.includes(name))) {
+      if ((gruppe1.includes(name) || gruppe2.includes(name)) && passwoerter[name] === password) {
         document.getElementById("loginForm").style.display = "none";
         document.getElementById("assignForm").style.display = "block";
-        
+
         if (Object.keys(wichtelZuordnungen).length === 0) {
           generiereWichtelzuweisungen();
         }
       } else {
-        alert("Dein Name muss in einer der Wichtelgruppen sein.");
+        alert("Name und Passwort stimmen nicht überein oder der Name ist in keiner Wichtelgruppe.");
       }
     }
 
     function generiereWichtelzuweisungen() {
       let gruppe2Copy = [...gruppe2];
-      
+
       // Zuweisungen von Gruppe 1 an Gruppe 2
       gruppe1.forEach((person, index) => {
         const seed = person.length + index;
@@ -61,9 +91,19 @@
         const wichtelPartner = gruppe2Copy.splice(randomIndex, 1)[0];
         wichtelZuordnungen[person] = wichtelPartner;
       });
-      
+
+      // Zuweisungen von Gruppe 2 an Gruppe 1
+      let gruppe1Copy = [...gruppe1];
+      for (let i = 0; i < gruppe1.length; i++) {
+        const person = gruppe2[i];
+        const seed = person.length + i;
+        const randomIndex = Math.floor(seedRandom(seed) * gruppe1Copy.length);
+        const wichtelPartner = gruppe1Copy.splice(randomIndex, 1)[0];
+        wichtelZuordnungen[person] = wichtelPartner;
+      }
+
       // Übrige Person aus Gruppe 2 wichtelt innerhalb von Gruppe 2
-      const interneWichtelPerson = gruppe2Copy[0];
+      const interneWichtelPerson = gruppe2[gruppe2.length - 1];
       let restGruppe2 = gruppe2.filter(person => person !== interneWichtelPerson);
       const seed = interneWichtelPerson.length;
       const randomIndex = Math.floor(seedRandom(seed) * restGruppe2.length);
@@ -82,4 +122,5 @@
     }
   </script>
 </body>
+
 </html>
